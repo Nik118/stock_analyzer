@@ -251,9 +251,27 @@
             box-shadow: var(--shadow-card);
             display: flex;
             flex-direction: column;
-            overflow: visible;
+            overflow-y: auto;
+            overflow-x: hidden;
+            position: relative;
             transition: all var(--transition-normal);
             animation: pane-enter 0.4s ease-out;
+        }
+
+        /* ── Individual Chart Pane Scrollbar ───────────────────────── */
+        .chart-pane::-webkit-scrollbar {
+            width: 7px;
+        }
+        .chart-pane::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 4px;
+        }
+        .chart-pane::-webkit-scrollbar-thumb {
+            background: var(--accent-indigo);
+            border-radius: 4px;
+        }
+        .chart-pane::-webkit-scrollbar-thumb:hover {
+            background: #818cf8;
         }
 
         @keyframes pane-enter {
@@ -441,14 +459,28 @@
             position: absolute;
             top: 100%;
             right: 0;
-            z-index: 200;
+            z-index: 999;
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
             padding: 8px;
-            min-width: 200px;
+            min-width: 210px;
+            max-height: 280px;
+            overflow-y: auto;
             box-shadow: var(--shadow-card);
             backdrop-filter: blur(var(--glass-blur));
+        }
+
+        .indicator-panel::-webkit-scrollbar {
+            width: 6px;
+        }
+        .indicator-panel::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 3px;
+        }
+        .indicator-panel::-webkit-scrollbar-thumb {
+            background: var(--accent-purple);
+            border-radius: 3px;
         }
 
         .indicator-panel.open {
@@ -802,13 +834,13 @@
             to   { transform: translateX(0); opacity: 1; }
         }
 
-        /* ── Alert Modal ───────────────────────────────────────────── */
+        /* ── Alert & Signal Modals ─────────────────────────────────── */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(4px);
-            z-index: 999;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(6px);
+            z-index: 2000;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -822,16 +854,31 @@
             pointer-events: auto;
         }
 
-        .modal-box {
+        .modal-card, .modal-box {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
             padding: 20px;
-            width: 340px;
-            box-shadow: var(--shadow-card);
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
             display: flex;
             flex-direction: column;
             gap: 14px;
+        }
+
+        .modal-card::-webkit-scrollbar, .modal-box::-webkit-scrollbar {
+            width: 6px;
+        }
+        .modal-card::-webkit-scrollbar-track, .modal-box::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 3px;
+        }
+        .modal-card::-webkit-scrollbar-thumb, .modal-box::-webkit-scrollbar-thumb {
+            background: var(--accent-indigo);
+            border-radius: 3px;
         }
 
         .modal-title {
@@ -1559,6 +1606,7 @@
                             <input type="text" class="symbol-input" id="${id}-symbol-input" placeholder="🔍 Search Ticker..." value="${config.symbol}" autocomplete="off" />
                             <div class="symbol-dropdown" id="${id}-symbol-dropdown"></div>
                         </div>
+                        <div class="ticker-signal signal-neutral" id="${id}-header-sig" title="Click to view Recommendation Analysis Breakdown" style="cursor: pointer; flex-shrink: 0;">—</div>
                         <select class="pane-select timeframe-select" id="${id}-timeframe" title="Timeframe">
                             ${TIMEFRAMES.map(tf => `<option value="${tf}">${tf}</option>`).join('')}
                         </select>
@@ -1599,7 +1647,6 @@
                         <span class="ticker-price" id="${id}-ticker-price">—</span>
                         <span class="ticker-change" id="${id}-ticker-change">—</span>
                         <span class="ticker-volume" id="${id}-ticker-vol"></span>
-                        <span class="ticker-signal signal-neutral" id="${id}-ticker-sig">—</span>
                     </div>
                 </div>
             `;
@@ -2662,14 +2709,15 @@
                 volEl.textContent = `Vol: ${formatVolume(volume)}`;
             }
 
-            // Update Technical Signal Badge
-            if (sigEl && pane.candles) {
+            // Update Top Header Recommendation Signal Badge
+            const headerSigEl = document.getElementById(`${pane.id}-header-sig`);
+            if (headerSigEl && pane.candles) {
                 const sig = computeSignal(pane);
-                sigEl.textContent = sig.text;
-                sigEl.className = `ticker-signal ${sig.class}`;
-                sigEl.style.cursor = 'pointer';
-                sigEl.title = `Click to view plain-text analysis breakdown for ${pane.symbol}`;
-                sigEl.onclick = () => openSignalModal(pane, sig);
+                headerSigEl.textContent = sig.text;
+                headerSigEl.className = `ticker-signal ${sig.class}`;
+                headerSigEl.style.cursor = 'pointer';
+                headerSigEl.title = `Click to view plain-text analysis breakdown for ${pane.symbol}`;
+                headerSigEl.onclick = () => openSignalModal(pane, sig);
             }
         }
 
