@@ -479,6 +479,422 @@
             color: var(--text-primary);
         }
 
+        /* ── Action Buttons (Snapshot, CSV, Alerts, Drawings) ───── */
+        .pane-action-btn {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all var(--transition-fast);
+        }
+
+        .pane-action-btn:hover {
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--text-primary);
+            border-color: var(--accent-indigo);
+        }
+
+        .pane-action-btn.active {
+            background: var(--accent-indigo);
+            color: white;
+            border-color: var(--accent-indigo);
+        }
+
+        /* ── Symbol Search Box & Autocompletion ──────────────────────── */
+        .symbol-search-box {
+            position: relative;
+            display: inline-block;
+        }
+
+        .symbol-input {
+            width: 160px;
+            font-weight: 600;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 4px 8px;
+            font-size: 12px;
+            transition: all var(--transition-fast);
+        }
+
+        .symbol-input:focus {
+            outline: none;
+            border-color: var(--accent-indigo);
+            box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
+            width: 210px;
+        }
+
+        .symbol-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            min-width: 250px;
+            max-height: 240px;
+            overflow-y: auto;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            margin-top: 4px;
+        }
+
+        .symbol-dropdown.open {
+            display: block;
+        }
+
+        .symbol-option {
+            padding: 8px 12px;
+            font-size: 11px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.15s ease;
+        }
+
+        .symbol-option:hover {
+            background: rgba(99, 102, 241, 0.25);
+            color: var(--text-primary);
+        }
+
+        .symbol-option .sym-code {
+            font-weight: 700;
+            color: var(--accent-indigo);
+        }
+
+        .symbol-option .sym-name {
+            font-size: 10px;
+            color: var(--text-muted);
+            max-width: 140px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ── Fundamentals Panel & Metrics ────────────────────────────── */
+        .fundamentals-panel {
+            display: none;
+            background: rgba(15, 23, 42, 0.95);
+            border-top: 1px solid var(--border-color);
+            padding: 8px 12px;
+            gap: 12px;
+            font-size: 11px;
+            backdrop-filter: blur(8px);
+            animation: slide-in 0.2s ease-out;
+        }
+
+        /* ── OHLC Candle Details Legend Overlay ─────────────────────── */
+        .ohlc-legend {
+            position: absolute;
+            top: 10px;
+            left: 12px;
+            z-index: 20;
+            font-size: 11px;
+            font-family: 'JetBrains Mono', 'Roboto Mono', monospace;
+            color: var(--text-secondary);
+            background: rgba(15, 23, 42, 0.85);
+            padding: 4px 10px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .ohlc-legend .lbl { color: var(--text-muted); font-weight: 500; }
+        .ohlc-legend .val { color: var(--text-primary); font-weight: 700; }
+        .ohlc-legend .val.up { color: #10b981; }
+        .ohlc-legend .val.down { color: #ef4444; }
+
+        .fundamentals-panel.open {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .fund-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            background: rgba(30, 41, 59, 0.6);
+            padding: 4px 10px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            min-width: 75px;
+        }
+
+        .fund-label {
+            font-size: 9px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .fund-value {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .ticker-symbol {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .ticker-name {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-muted);
+            max-width: 190px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+            vertical-align: bottom;
+        }
+
+        /* ── Recommendation Breakdown Modal Items ─────────────────────── */
+        .signal-factor-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            line-height: 1.4;
+        }
+
+        .signal-factor-item.positive {
+            border-left: 3px solid #10b981;
+            color: #f8fafc;
+        }
+
+        .signal-factor-item.negative {
+            border-left: 3px solid #ef4444;
+            color: #f8fafc;
+        }
+
+        .fund-value.positive { color: #10b981; }
+        .fund-value.negative { color: #ef4444; }
+
+        /* ── Preset Controls ───────────────────────────────────────── */
+        .preset-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-tertiary);
+            padding: 4px 8px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .preset-controls label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .preset-select {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .preset-btn {
+            background: var(--gradient-accent);
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .preset-btn:hover { opacity: 0.9; }
+
+        /* ── Toast Notifications ───────────────────────────────────── */
+        #toast-container {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: rgba(15, 23, 42, 0.95);
+            border-left: 4px solid var(--accent-indigo);
+            color: var(--text-primary);
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            backdrop-filter: blur(8px);
+            animation: slide-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: auto;
+        }
+
+        .toast.success { border-left-color: var(--accent-green); }
+        .toast.warning { border-left-color: var(--accent-red); }
+
+        .chart-pane {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            box-shadow: var(--shadow-card);
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform 0.2s ease;
+        }
+
+        .chart-pane:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .chart-pane.maximized {
+            position: fixed !important;
+            top: 65px !important;
+            left: 12px !important;
+            right: 12px !important;
+            bottom: 12px !important;
+            z-index: 999 !important;
+            box-shadow: 0 0 50px rgba(99, 102, 241, 0.5) !important;
+            border-color: var(--accent-indigo) !important;
+        }
+
+        @keyframes slide-in {
+            from { transform: translateX(100%); opacity: 0; }
+            to   { transform: translateX(0); opacity: 1; }
+        }
+
+        /* ── Alert Modal ───────────────────────────────────────────── */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            width: 340px;
+            box-shadow: var(--shadow-card);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .modal-title {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-left: auto;
+        }
+
+        /* ── Buy / Sell Signal Badges ───────────────────────────────── */
+        .ticker-signal {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .signal-strong-buy { background: rgba(16, 185, 129, 0.25); color: #10b981; border: 1px solid #10b981; }
+        .signal-buy        { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.5); }
+        .signal-neutral    { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid #64748b; }
+        .signal-sell       { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.5); }
+        .signal-strong-sell{ background: rgba(239, 68, 68, 0.25); color: #ef4444; border: 1px solid #ef4444; }
+
+        .modal-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .modal-input-group label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .modal-input {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 10px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            outline: none;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-top: 6px;
+        }
+
         .indicator-panel input[type="checkbox"] {
             accent-color: var(--accent-purple);
         }
@@ -591,20 +1007,32 @@
             <span class="logo-badge" id="live-badge">● Live</span>
         </div>
 
+        <div class="preset-controls">
+            <label>Workspace:</label>
+            <select id="preset-select" class="preset-select" title="Load Workspace Preset">
+                <option value="us_tech">US Tech Watch</option>
+                <option value="india_bluechips">Indian Bluechips</option>
+                <option value="default_crypto">Crypto Terminal</option>
+                <option value="binance_top">Binance Top Pairs</option>
+            </select>
+            <button class="preset-btn" id="save-preset-btn" title="Save Layout to LocalStorage">💾 Save Layout</button>
+        </div>
+
         <div class="chart-count-selector">
             <label>Charts:</label>
             <div class="count-buttons" id="count-buttons">
                 <button class="count-btn" data-count="1">1</button>
                 <button class="count-btn active" data-count="2">2</button>
                 <button class="count-btn" data-count="4">4</button>
-                <button class="count-btn" data-count="6">6</button>
-                <button class="count-btn" data-count="8">8</button>
             </div>
         </div>
 
-        <div class="connection-status">
-            <div class="status-dot" id="ws-status-dot"></div>
-            <span id="ws-status-text">Connecting…</span>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <button class="preset-btn" id="fullscreen-btn" title="Toggle Fullscreen Mode">⛶ Fullscreen</button>
+            <div class="connection-status">
+                <div class="status-dot" id="ws-status-dot"></div>
+                <span id="ws-status-text">Connecting…</span>
+            </div>
         </div>
     </header>
 
@@ -613,6 +1041,79 @@
          ═══════════════════════════════════════════════════════════════ -->
     <div id="chart-grid" data-count="2">
         <!-- Chart panes are created dynamically by JS -->
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container"></div>
+
+    <!-- Alert Modal Overlay -->
+    <div class="modal-overlay" id="alert-modal">
+        <div class="modal-box">
+            <div class="modal-title">
+                <span>🔔 Set Price Alert</span>
+                <span style="cursor:pointer;" id="alert-modal-close">✕</span>
+            </div>
+            <div class="modal-input-group">
+                <label>Symbol / Source:</label>
+                <input class="modal-input" id="alert-modal-symbol" readonly />
+            </div>
+            <div class="modal-input-group">
+                <label>Current Price:</label>
+                <input class="modal-input" id="alert-modal-current" readonly />
+            </div>
+            <div class="modal-input-group">
+                <label>Target Target Price (> or <):</label>
+                <input class="modal-input" id="alert-modal-price" type="number" step="any" placeholder="e.g. 65000" />
+            </div>
+            <div class="modal-input-group">
+                <label>Condition:</label>
+                <select class="modal-input" id="alert-modal-condition">
+                    <option value="above">Price Rises Above Target</option>
+                    <option value="below">Price Drops Below Target</option>
+                </select>
+            </div>
+            <div class="modal-buttons">
+                <button class="pane-action-btn" id="alert-modal-cancel">Cancel</button>
+                <button class="preset-btn" id="alert-modal-save">Set Alert</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recommendation Explanation Breakdown Modal -->
+    <div class="modal-overlay" id="signal-modal">
+        <div class="modal-card" style="max-width: 600px;">
+            <div class="modal-header">
+                <span id="signal-modal-title">🤖 Recommendation Breakdown</span>
+                <span style="cursor:pointer;" id="signal-modal-close">✕</span>
+            </div>
+
+            <div style="margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border-color);">
+                <div>
+                    <div id="signal-modal-stock" style="font-weight: 700; font-size: 15px; color: var(--text-primary);">—</div>
+                    <div id="signal-modal-price" style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Price: —</div>
+                </div>
+                <div id="signal-modal-badge" class="ticker-signal" style="font-size: 13px; padding: 6px 14px; cursor: default;">—</div>
+            </div>
+
+            <div class="modal-input-group" style="margin-bottom: 16px;">
+                <label style="font-weight: 600; color: var(--accent-indigo);">Executive Summary:</label>
+                <p id="signal-modal-summary" style="font-size: 12px; line-height: 1.5; color: var(--text-secondary); background: rgba(15,23,42,0.7); padding: 10px 12px; border-radius: 6px; border-left: 3px solid var(--accent-indigo); margin: 4px 0 0 0;"></p>
+            </div>
+
+            <div class="modal-input-group" style="margin-bottom: 16px;">
+                <label style="font-weight: 600; color: #10b981;">🟢 Positives & Bullish Catalysts:</label>
+                <div id="signal-modal-positives" style="margin-top: 6px; display: flex; flex-direction: column; gap: 6px;"></div>
+            </div>
+
+            <div class="modal-input-group" style="margin-bottom: 16px;">
+                <label style="font-weight: 600; color: #ef4444;">🔴 Risks & Bearish Concerns:</label>
+                <div id="signal-modal-negatives" style="margin-top: 6px; display: flex; flex-direction: column; gap: 6px;"></div>
+            </div>
+
+            <div class="modal-buttons" style="justify-content: flex-end;">
+                <button class="preset-btn" id="signal-modal-ok">Got it</button>
+            </div>
+        </div>
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════════
@@ -650,17 +1151,13 @@
         ];
 
         const DEFAULT_CONFIGS = [
-            { source: 'hyperliquid', symbol: 'BTC',  timeframe: '1m' },
-            { source: 'hyperliquid', symbol: 'ETH',  timeframe: '1m' },
-            { source: 'yahoo_us',    symbol: 'AAPL', timeframe: '1D' },
-            { source: 'yahoo_us',    symbol: 'NVDA', timeframe: '1D' },
-            { source: 'yahoo_india', symbol: 'RELIANCE.NS', timeframe: '1D' },
-            { source: 'yahoo_india', symbol: 'TCS.NS',      timeframe: '1D' },
-            { source: 'hyperliquid', symbol: 'SOL',  timeframe: '1m' },
-            { source: 'hyperliquid', symbol: 'DOGE', timeframe: '1m' },
+            { source: 'yahoo_us', symbol: 'AAPL', timeframe: '1D' },
+            { source: 'yahoo_us', symbol: 'NVDA', timeframe: '1D' },
+            { source: 'yahoo_us', symbol: 'GOOGL', timeframe: '1D' },
+            { source: 'yahoo_us', symbol: 'MSFT', timeframe: '1D' },
         ];
 
-        const TIMEFRAMES = ['1m', '5m', '15m', '1h', '4h', '1D', '1W'];
+        const TIMEFRAMES = ['5m', '15m', '1h', '4h', '1D', '1W'];
 
         let chartCount = 2;
         let panes = [];     // Array of pane state objects
@@ -1053,13 +1550,15 @@
                 <div class="chart-pane" id="${id}" data-index="${index}">
                     <div class="pane-header">
                         <select class="pane-select source-select" id="${id}-source" title="Data Source">
-                            <option value="hyperliquid">Hyperliquid (Crypto)</option>
                             <option value="yahoo_us">Yahoo Finance (US)</option>
                             <option value="yahoo_india">Yahoo Finance (India)</option>
+                            <option value="hyperliquid">Hyperliquid (Crypto)</option>
+                            <option value="binance">Binance (Crypto)</option>
                         </select>
-                        <select class="pane-select symbol-select" id="${id}-symbol" title="Symbol">
-                            <option value="">Loading…</option>
-                        </select>
+                        <div class="symbol-search-box" id="${id}-search-box">
+                            <input type="text" class="symbol-input" id="${id}-symbol-input" placeholder="🔍 Search Ticker..." value="${config.symbol}" autocomplete="off" />
+                            <div class="symbol-dropdown" id="${id}-symbol-dropdown"></div>
+                        </div>
                         <select class="pane-select timeframe-select" id="${id}-timeframe" title="Timeframe">
                             ${TIMEFRAMES.map(tf => `<option value="${tf}">${tf}</option>`).join('')}
                         </select>
@@ -1071,8 +1570,24 @@
                                 ${indicatorHTML}
                             </div>
                         </div>
+                        <button class="pane-action-btn" id="${id}-fund-btn" title="Toggle Fundamental Analysis Metrics">📊 Fundamentals</button>
+                        <button class="pane-action-btn" id="${id}-line-btn" title="Add Price Line at current price">➖ Line</button>
+                        <button class="pane-action-btn" id="${id}-alert-btn" title="Set Price Alert">🔔 Alert</button>
+                        <button class="pane-action-btn" id="${id}-snap-btn" title="Download PNG Chart Snapshot">📸 PNG</button>
+                        <button class="pane-action-btn" id="${id}-max-btn" title="Maximize / Focus Chart">⤢ Expand</button>
+                    </div>
+                    <div class="fundamentals-panel" id="${id}-fund-panel">
+                        <div class="fund-item"><span class="fund-label">TTM PE</span><span class="fund-value" id="${id}-fund-pe-ttm">—</span></div>
+                        <div class="fund-item"><span class="fund-label">Fwd PE</span><span class="fund-value" id="${id}-fund-pe-fwd">—</span></div>
+                        <div class="fund-item"><span class="fund-label">EPS (TTM)</span><span class="fund-value" id="${id}-fund-eps">—</span></div>
+                        <div class="fund-item"><span class="fund-label">PEG Ratio</span><span class="fund-value" id="${id}-fund-peg">—</span></div>
+                        <div class="fund-item"><span class="fund-label">P/B Ratio</span><span class="fund-value" id="${id}-fund-pb">—</span></div>
+                        <div class="fund-item"><span class="fund-label">Mkt Cap</span><span class="fund-value" id="${id}-fund-mktcap">—</span></div>
+                        <div class="fund-item"><span class="fund-label">Div Yield</span><span class="fund-value" id="${id}-fund-div">—</span></div>
+                        <div class="fund-item"><span class="fund-label">Margin</span><span class="fund-value" id="${id}-fund-margin">—</span></div>
                     </div>
                     <div class="chart-container" id="${id}-chart">
+                        <div class="ohlc-legend" id="${id}-ohlc">O: — H: — L: — C: —</div>
                         <div class="chart-loading" id="${id}-loading">
                             <div class="spinner"></div>
                         </div>
@@ -1080,9 +1595,11 @@
                     <div class="rsi-container" id="${id}-rsi"></div>
                     <div class="ticker-bar" id="${id}-ticker">
                         <span class="ticker-symbol" id="${id}-ticker-sym">—</span>
+                        <span class="ticker-name" id="${id}-ticker-name"></span>
                         <span class="ticker-price" id="${id}-ticker-price">—</span>
                         <span class="ticker-change" id="${id}-ticker-change">—</span>
                         <span class="ticker-volume" id="${id}-ticker-vol"></span>
+                        <span class="ticker-signal signal-neutral" id="${id}-ticker-sig">—</span>
                     </div>
                 </div>
             `;
@@ -1108,18 +1625,32 @@
                 candles: [],
                 activeIndicators: new Set(),
                 lastPrice: null,
+                fundamentals: null,
             };
 
             // Set select values
             const sourceSelect = document.getElementById(`${id}-source`);
-            const symbolSelect = document.getElementById(`${id}-symbol`);
             const timeframeSelect = document.getElementById(`${id}-timeframe`);
+            const symbolInput = document.getElementById(`${id}-symbol-input`);
 
             sourceSelect.value = config.source;
             timeframeSelect.value = config.timeframe;
+            if (symbolInput) {
+                symbolInput.value = config.symbol;
+            }
 
-            // Load symbols for this source
-            await populateSymbolSelect(id, config.source, config.symbol);
+            // Fetch company full name on initial load
+            try {
+                fetch(`/api/search/${config.source}?q=${encodeURIComponent(config.symbol)}`)
+                    .then(r => r.json())
+                    .then(d => {
+                        if (d.results && d.results.length > 0) {
+                            pane.companyName = d.results[0].name.replace(/^.*?—\s*/, '');
+                            const nameEl = document.getElementById(`${id}-ticker-name`);
+                            if (nameEl) nameEl.textContent = `— ${pane.companyName}`;
+                        }
+                    }).catch(() => {});
+            } catch(e) {}
 
             // Create Lightweight Chart
             const chartContainer = document.getElementById(`${id}-chart`);
@@ -1170,6 +1701,36 @@
                 scaleMargins: { top: 0.85, bottom: 0 },
             });
 
+            // Subscribe Crosshair Move to show Candle Hover details (OHLCV)
+            const ohlcEl = document.getElementById(`${id}-ohlc`);
+            pane.chart.subscribeCrosshairMove((param) => {
+                if (!ohlcEl) return;
+                if (!param || !param.seriesData || !param.time) {
+                    if (pane.candles && pane.candles.length > 0) {
+                        const last = pane.candles[pane.candles.length - 1];
+                        const isUp = last.close >= last.open;
+                        ohlcEl.innerHTML = `<span class="lbl">O:</span><span class="val">${formatPrice(last.open)}</span> ` +
+                            `<span class="lbl">H:</span><span class="val">${formatPrice(last.high)}</span> ` +
+                            `<span class="lbl">L:</span><span class="val">${formatPrice(last.low)}</span> ` +
+                            `<span class="lbl">C:</span><span class="val ${isUp ? 'up' : 'down'}">${formatPrice(last.close)}</span> ` +
+                            `<span class="lbl">Vol:</span><span class="val">${formatVolume(last.volume || 0)}</span>`;
+                    }
+                    return;
+                }
+
+                const bar = param.seriesData.get(pane.candleSeries);
+                const volBar = param.seriesData.get(pane.volumeSeries);
+                if (bar) {
+                    const isUp = bar.close >= bar.open;
+                    const volVal = volBar ? volBar.value : (bar.volume || 0);
+                    ohlcEl.innerHTML = `<span class="lbl">O:</span><span class="val">${formatPrice(bar.open)}</span> ` +
+                        `<span class="lbl">H:</span><span class="val">${formatPrice(bar.high)}</span> ` +
+                        `<span class="lbl">L:</span><span class="val">${formatPrice(bar.low)}</span> ` +
+                        `<span class="lbl">C:</span><span class="val ${isUp ? 'up' : 'down'}">${formatPrice(bar.close)}</span> ` +
+                        `<span class="lbl">Vol:</span><span class="val">${formatVolume(volVal)}</span>`;
+                }
+            });
+
             // Handle resize
             const ro = new ResizeObserver(() => {
                 if (pane.chart) {
@@ -1191,16 +1752,14 @@
             // Event listeners
             sourceSelect.addEventListener('change', async () => {
                 pane.source = sourceSelect.value;
-                await populateSymbolSelect(id, pane.source);
-                const newSymbol = symbolSelect.value;
-                if (newSymbol) {
-                    await switchSymbol(pane, newSymbol);
+                const input = document.getElementById(`${id}-symbol-input`);
+                if (input && input.value) {
+                    await switchSymbol(pane, input.value.trim());
                 }
             });
 
-            symbolSelect.addEventListener('change', async () => {
-                await switchSymbol(pane, symbolSelect.value);
-            });
+            // Setup Symbol Autocompletion Search Box
+            setupSymbolSearch(pane);
 
             timeframeSelect.addEventListener('change', async () => {
                 pane.timeframe = timeframeSelect.value;
@@ -1241,10 +1800,93 @@
                 });
             });
 
+            // Pane Action Buttons (Fundamentals, Line, Alert, PNG, CSV)
+            const fundBtn = document.getElementById(`${id}-fund-btn`);
+            const fundPanel = document.getElementById(`${id}-fund-panel`);
+            const lineBtn = document.getElementById(`${id}-line-btn`);
+            const alertBtn = document.getElementById(`${id}-alert-btn`);
+            const snapBtn = document.getElementById(`${id}-snap-btn`);
+            const csvBtn = document.getElementById(`${id}-csv-btn`);
+
+            if (fundBtn && fundPanel) {
+                fundBtn.addEventListener('click', () => {
+                    fundPanel.classList.toggle('open');
+                    fundBtn.classList.toggle('active', fundPanel.classList.contains('open'));
+                });
+            }
+
+            if (lineBtn) {
+                lineBtn.addEventListener('click', () => {
+                    if (!pane.candleSeries) return;
+
+                    if (pane.currentPriceLine) {
+                        pane.candleSeries.removePriceLine(pane.currentPriceLine);
+                        pane.currentPriceLine = null;
+                        lineBtn.classList.remove('active');
+                        showToast(`Removed Price Line on ${pane.symbol}`, 'info');
+                    } else if (pane.lastPrice) {
+                        pane.currentPriceLine = pane.candleSeries.createPriceLine({
+                            price: pane.lastPrice,
+                            color: '#f59e0b',
+                            lineWidth: 1.5,
+                            lineStyle: 2,
+                            title: `Line @ ${formatPrice(pane.lastPrice)}`,
+                        });
+                        lineBtn.classList.add('active');
+                        showToast(`Added Price Line at ${formatPrice(pane.lastPrice)} on ${pane.symbol}`, 'success');
+                    }
+                });
+            }
+
+            if (alertBtn) {
+                alertBtn.addEventListener('click', () => {
+                    activeAlertPane = pane;
+                    document.getElementById('alert-modal-symbol').value = `${pane.symbol} (${pane.source})`;
+                    document.getElementById('alert-modal-current').value = formatPrice(pane.lastPrice || 0);
+                    document.getElementById('alert-modal-price').value = (pane.lastPrice || 0).toFixed(2);
+                    document.getElementById('alert-modal').classList.add('active');
+                });
+            }
+
+            if (snapBtn) {
+                snapBtn.addEventListener('click', () => {
+                    try {
+                        const canvas = pane.chart.takeScreenshot();
+                        const link = document.createElement('a');
+                        link.download = `${pane.symbol}_${pane.source}_${pane.timeframe}_chart.png`;
+                        link.href = canvas.toDataURL('image/png');
+                        link.click();
+                        showToast(`Downloaded PNG snapshot for ${pane.symbol}`, 'success');
+                    } catch (e) {
+                        showToast(`Failed to capture PNG snapshot`, 'warning');
+                    }
+                });
+            }
+
+            // Maximize / Focus Mode Button
+            const maxBtn = document.getElementById(`${id}-max-btn`);
+            if (maxBtn) {
+                maxBtn.addEventListener('click', () => {
+                    const paneEl = document.getElementById(pane.id);
+                    const isMax = paneEl.classList.toggle('maximized');
+                    maxBtn.textContent = isMax ? '⤓ Restore' : '⤢ Expand';
+                    maxBtn.classList.toggle('active', isMax);
+
+                    // Resize chart smoothly
+                    setTimeout(() => {
+                        const chartEl = document.getElementById(`${id}-chart`);
+                        if (chartEl && pane.chart) {
+                            pane.chart.resize(chartEl.clientWidth, chartEl.clientHeight);
+                        }
+                    }, 50);
+                });
+            }
+
             panes[index] = pane;
 
-            // Load historical data and subscribe
+            // Load historical data, fundamentals, and subscribe
             await loadHistoricalData(pane);
+            loadFundamentals(pane);
             wsSubscribe(pane);
 
             return pane;
@@ -1252,6 +1894,7 @@
 
         async function populateSymbolSelect(paneId, source, defaultSymbol) {
             const select = document.getElementById(`${paneId}-symbol`);
+            if (!select) return;
             select.innerHTML = '<option value="">Loading…</option>';
 
             const symbols = await loadSymbols(source);
@@ -1270,6 +1913,86 @@
             }
         }
 
+        function setupSymbolSearch(pane) {
+            const input = document.getElementById(`${pane.id}-symbol-input`);
+            const dropdown = document.getElementById(`${pane.id}-symbol-dropdown`);
+            if (!input || !dropdown) return;
+
+            let debounceTimer = null;
+
+            async function performSearch() {
+                const query = input.value.trim();
+                if (!query) {
+                    dropdown.classList.remove('open');
+                    return;
+                }
+
+                try {
+                    const resp = await fetch(`/api/search/${pane.source}?q=${encodeURIComponent(query)}`);
+                    const data = await resp.json();
+                    const results = data.results || [];
+
+                    if (results.length === 0) {
+                        dropdown.innerHTML = `<div class="symbol-option"><span class="sym-name">No matching ticker symbols</span></div>`;
+                    } else {
+                        dropdown.innerHTML = results.map(item => `
+                            <div class="symbol-option" data-symbol="${item.symbol}">
+                                <span class="sym-code">${item.symbol}</span>
+                                <span class="sym-name">${item.name}</span>
+                            </div>
+                        `).join('');
+
+                        dropdown.querySelectorAll('.symbol-option[data-symbol]').forEach(opt => {
+                            opt.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                const selectedSym = opt.dataset.symbol;
+                                const nameSpan = opt.querySelector('.sym-name');
+                                if (nameSpan) {
+                                    pane.companyName = nameSpan.textContent.replace(/^.*?—\s*/, '');
+                                }
+                                input.value = selectedSym;
+                                dropdown.classList.remove('open');
+                                switchSymbol(pane, selectedSym);
+                            });
+                        });
+                    }
+                    dropdown.classList.add('open');
+                } catch (e) {
+                    console.warn('Search error:', e);
+                }
+            }
+
+            input.addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(performSearch, 250);
+            });
+
+            input.addEventListener('focus', () => {
+                if (input.value.trim().length > 0) {
+                    performSearch();
+                }
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    clearTimeout(debounceTimer);
+                    dropdown.classList.remove('open');
+                    const sym = input.value.trim().toUpperCase();
+                    if (sym) {
+                        input.value = sym;
+                        switchSymbol(pane, sym);
+                    }
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.remove('open');
+                }
+            });
+        }
+
         async function switchSymbol(pane, newSymbol) {
             // Unsubscribe old
             if (pane.symbol && ws && ws.readyState === WebSocket.OPEN) {
@@ -1283,6 +2006,25 @@
             pane.symbol = newSymbol;
             pane.lastPrice = null;
 
+            // Reset current price line if active
+            if (pane.currentPriceLine && pane.candleSeries) {
+                pane.candleSeries.removePriceLine(pane.currentPriceLine);
+                pane.currentPriceLine = null;
+                const lineBtn = document.getElementById(`${pane.id}-line-btn`);
+                if (lineBtn) lineBtn.classList.remove('active');
+            }
+
+            // Fetch company full name if not cached
+            try {
+                fetch(`/api/search/${pane.source}?q=${encodeURIComponent(pane.symbol)}`)
+                    .then(r => r.json())
+                    .then(d => {
+                        if (d.results && d.results.length > 0) {
+                            pane.companyName = d.results[0].name.replace(/^.*?—\s*/, '');
+                        }
+                    }).catch(() => {});
+            } catch(e) {}
+
             // Clear old chart data immediately so stale data doesn't linger
             pane.candles = [];
             pane.candleSeries.setData([]);
@@ -1291,6 +2033,7 @@
             updateTickerBar(pane, 0, 0, 0, 0);
 
             await loadHistoricalData(pane);
+            loadFundamentals(pane);
             wsSubscribe(pane);
         }
 
@@ -1304,7 +2047,7 @@
                 const timeout = setTimeout(() => controller.abort(), 45000);
 
                 const resp = await fetch(
-                    `/api/historical/${pane.source}/${encodeURIComponent(pane.symbol)}?timeframe=${pane.timeframe}&limit=300`,
+                    `/api/historical/${pane.source}/${encodeURIComponent(pane.symbol)}?timeframe=${pane.timeframe}&limit=3000`,
                     { signal: controller.signal }
                 );
                 clearTimeout(timeout);
@@ -1570,19 +2313,6 @@
                         });
                         break;
                     }
-                    case 'stoch': {
-                        const stochRes = TA.stochastic(data, 14, 3, 3);
-                        const sK = pane.chart.addLineSeries({ color: '#eab308', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, priceScaleId: 'stoch' });
-                        const sD = pane.chart.addLineSeries({ color: '#38bdf8', lineWidth: 1, lineStyle: 2, priceLineVisible: false, lastValueVisible: false, priceScaleId: 'stoch' });
-                        sK.setData(stochRes.k);
-                        sD.setData(stochRes.d);
-                        pane.indicatorSeries.stochK = sK;
-                        pane.indicatorSeries.stochD = sD;
-                        pane.chart.priceScale('stoch').applyOptions({
-                            scaleMargins: { top: 0.7, bottom: 0.02 },
-                        });
-                        break;
-                    }
                 }
             });
 
@@ -1592,7 +2322,6 @@
                     const rc = document.getElementById(`${pane.id}-rsi`);
                     pane.rsiChart.applyOptions({ width: rc.clientWidth, height: rc.clientHeight });
                 }
-                // Also resize main chart since RSI pane may have appeared/disappeared
                 const cc = document.getElementById(`${pane.id}-chart`);
                 if (pane.chart) {
                     pane.chart.applyOptions({ width: cc.clientWidth, height: cc.clientHeight });
@@ -1601,17 +2330,320 @@
         }
 
         // ================================================================
+        // TECHNICAL SIGNAL ENGINE (BUY / SELL RECOMMENDATION)
+        // ================================================================
+
+        // ── SECULAR AI MEGATREND ECOSYSTEM MATRIX ──────────────────────────────
+        const AI_ECOSYSTEM_MAP = {
+            // Compute & AI Chips
+            'NVDA':  { category: 'AI Compute & GPUs', bonus: 3.0 },
+            'AMD':   { category: 'AI Accelerators & Chips', bonus: 2.5 },
+            'AVGO':  { category: 'AI ASICs & Networking', bonus: 2.5 },
+            'TSM':   { category: 'AI Semiconductor Foundry', bonus: 3.0 },
+            'ARM':   { category: 'AI CPU/NPU Architecture', bonus: 2.5 },
+            'QCOM':  { category: 'Edge AI Chips', bonus: 2.0 },
+            'INTC':  { category: 'AI Compute & Foundry', bonus: 1.5 },
+
+            // Memory & High-Bandwidth Storage (HBM)
+            'MU':    { category: 'AI High-Bandwidth Memory (HBM)', bonus: 3.0 },
+            'WDC':   { category: 'Enterprise AI Data Storage', bonus: 2.0 },
+            'STX':   { category: 'Enterprise AI Storage', bonus: 2.0 },
+
+            // Infrastructure, Servers & Liquid Cooling
+            'SMCI':  { category: 'AI Server Racks & Clusters', bonus: 3.0 },
+            'DELL':  { category: 'Enterprise AI Servers', bonus: 2.0 },
+            'ANET':  { category: 'AI Data Center Networking (800G)', bonus: 2.5 },
+            'VRT':   { category: 'AI Data Center Liquid Cooling', bonus: 3.0 },
+            'ETN':   { category: 'AI Electrical Power Management', bonus: 2.5 },
+            'HPE':   { category: 'Enterprise AI Infrastructure', bonus: 1.5 },
+
+            // AI Power & Clean Energy Infrastructure
+            'CEG':   { category: 'Nuclear Energy for AI Data Centers', bonus: 3.0 },
+            'VST':   { category: 'Clean Power for AI Hyperscalers', bonus: 3.0 },
+            'GEV':   { category: 'AI Grid Electrification', bonus: 2.5 },
+            'NRG':   { category: 'Data Center Energy Power', bonus: 2.0 },
+
+            // Hyperscalers, AI Platforms & Foundation Models
+            'GOOGL': { category: 'AI Models (Gemini), TPU & Cloud', bonus: 2.5 },
+            'GOOG':  { category: 'AI Models (Gemini), TPU & Cloud', bonus: 2.5 },
+            'MSFT':  { category: 'Azure AI & Copilot Ecosystem', bonus: 2.5 },
+            'AMZN':  { category: 'AWS AI Chips & Cloud Infra', bonus: 2.5 },
+            'META':  { category: 'Llama AI Models & Infrastructure', bonus: 2.5 },
+            'PLTR':  { category: 'Enterprise AI Operating System (AIP)', bonus: 3.0 },
+            'ORCL':  { category: 'AI Data Center Cloud Infra', bonus: 2.5 },
+        };
+
+        function computeSignal(pane) {
+            if (!pane.candles || pane.candles.length < 15) {
+                return { rating: 'NEUTRAL', text: 'NEUTRAL ⬌', class: 'signal-neutral', score: 0, reasons: ['Loading market data…'], positives: [], negatives: [] };
+            }
+            const data = pane.candles;
+            const lastCandle = data[data.length - 1];
+            const lastClose = lastCandle.close;
+            const lastVol = lastCandle.volume || 0;
+
+            let score = 0;
+            const reasons = [];
+            const positives = [];
+            const negatives = [];
+
+            // ── SECULAR AI MEGATREND SECTOR PREMIUM ────────────────────────
+            const baseSym = pane.symbol ? pane.symbol.split('.')[0].toUpperCase() : '';
+            const aiInfo = AI_ECOSYSTEM_MAP[baseSym] || AI_ECOSYSTEM_MAP[(pane.symbol || '').toUpperCase()];
+            if (aiInfo) {
+                score += aiInfo.bonus;
+                const msg = `🤖 Secular AI Megatrend Leader (${aiInfo.category}) — Strong 5-10Y Growth Tailwinds (+${aiInfo.bonus} pts)`;
+                reasons.push(msg); positives.push(msg);
+            }
+
+            // ── AGGRESSIVE 5-10 YEAR HORIZON QUANT EVALUATION ───────────────
+
+            // 1. Fundamentals & Growth Moat (Primary 40% Weight for 5-10Y Horizon)
+            if (pane.fundamentals) {
+                const f = pane.fundamentals;
+
+                // PEG Ratio (Price/Earnings-to-Growth: Ultimate 5-10Y Growth Metric)
+                if (f.peg_ratio != null && !isNaN(f.peg_ratio)) {
+                    if (f.peg_ratio < 1.0 && f.peg_ratio > 0) {
+                        score += 3.0;
+                        const msg = `⚡ Undervalued Growth Compounder (PEG ${f.peg_ratio} < 1.0) — High 5-10Y Upside`;
+                        reasons.push(msg); positives.push(msg);
+                    } else if (f.peg_ratio <= 1.5 && f.peg_ratio >= 1.0) {
+                        score += 1.5;
+                        const msg = `Fair Growth Valuation (PEG ${f.peg_ratio}) — Solid 5-10Y Growth`;
+                        reasons.push(msg); positives.push(msg);
+                    } else if (f.peg_ratio > 2.5) {
+                        score -= 1.5;
+                        const msg = `High Growth Premium (PEG ${f.peg_ratio} > 2.5) — High Multi-Year Expectations`;
+                        reasons.push(msg); negatives.push(msg);
+                    }
+                }
+
+                // Earnings Expansion Trend (Forward PE vs TTM PE)
+                if (f.pe_forward != null && f.pe_ttm != null && f.pe_ttm > 0) {
+                    if (f.pe_forward < f.pe_ttm) {
+                        score += 2.5;
+                        const msg = `Multi-Year Earnings Acceleration (Forward PE ${f.pe_forward} < TTM PE ${f.pe_ttm})`;
+                        reasons.push(msg); positives.push(msg);
+                    } else if (f.pe_forward > f.pe_ttm * 1.25) {
+                        score -= 1.5;
+                        const msg = `Earnings Deceleration Risk (Forward PE ${f.pe_forward} > TTM PE ${f.pe_ttm})`;
+                        reasons.push(msg); negatives.push(msg);
+                    }
+                }
+
+                // Profitability & Economic Moat
+                if (f.profit_margins != null) {
+                    if (f.profit_margins >= 20) {
+                        score += 2.0;
+                        const msg = `Wide Economic Moat & High Profit Margin (${f.profit_margins}%)`;
+                        reasons.push(msg); positives.push(msg);
+                    } else if (f.profit_margins > 10) {
+                        score += 1.0;
+                        const msg = `Healthy Profit Margin (${f.profit_margins}%)`;
+                        reasons.push(msg); positives.push(msg);
+                    } else if (f.profit_margins < 0) {
+                        score -= 1.5;
+                        const msg = `Negative Profit Margin (${f.profit_margins}%) — Cash Burn Risk`;
+                        reasons.push(msg); negatives.push(msg);
+                    }
+                }
+
+                // EPS Quality
+                if (f.eps_ttm != null) {
+                    if (f.eps_ttm > 0) {
+                        score += 1.5;
+                        const msg = `Profitable Business Model (EPS: $${f.eps_ttm})`;
+                        reasons.push(msg); positives.push(msg);
+                    } else if (f.eps_ttm < 0) {
+                        score -= 2.0;
+                        const msg = `Unprofitable Unit Economics (EPS: $${f.eps_ttm}) — Speculative Risk`;
+                        reasons.push(msg); negatives.push(msg);
+                    }
+                }
+            }
+
+            // 2. Macro Secular Trend Structure (35% Weight)
+            const sma20 = TA.sma(data, 20);
+            const sma50 = TA.sma(data, 50);
+            if (sma20.length > 0 && sma50.length > 0) {
+                const s20 = sma20[sma20.length - 1].value;
+                const s50 = sma50[sma50.length - 1].value;
+
+                if (lastClose > s20 && s20 > s50) {
+                    score += 2.5;
+                    const msg = `Macro Secular Bull Trend (Price > SMA20 > SMA50)`;
+                    reasons.push(msg); positives.push(msg);
+                } else if (lastClose < s20 && s20 < s50) {
+                    score -= 2.5;
+                    const msg = `Macro Bear Trend Structure (Price < SMA20 < SMA50)`;
+                    reasons.push(msg); negatives.push(msg);
+                } else if (lastClose > s20) {
+                    score += 1.0;
+                    const msg = `Bullish Trend Support (Price > SMA20)`;
+                    reasons.push(msg); positives.push(msg);
+                } else if (lastClose < s20) {
+                    score -= 1.0;
+                    const msg = `Below Short-Term Moving Average (Price < SMA20)`;
+                    reasons.push(msg); negatives.push(msg);
+                }
+            }
+
+            // Supertrend (10, 3)
+            const stVals = TA.supertrend(data, 10, 3);
+            if (stVals.length > 0) {
+                const st = stVals[stVals.length - 1].value;
+                if (lastClose > st) {
+                    score += 1.5;
+                    const msg = `Supertrend Bullish Alignment (Price > ${st})`;
+                    reasons.push(msg); positives.push(msg);
+                } else {
+                    score -= 1.5;
+                    const msg = `Supertrend Bearish Alignment (Price < ${st})`;
+                    reasons.push(msg); negatives.push(msg);
+                }
+            }
+
+            // EMA 12 vs 26
+            const ema12 = TA.ema(data, 12);
+            const ema26 = TA.ema(data, 26);
+            if (ema12.length > 0 && ema26.length > 0) {
+                const e12 = ema12[ema12.length - 1].value;
+                const e26 = ema26[ema26.length - 1].value;
+                if (e12 > e26) {
+                    score += 1.0;
+                    const msg = `Medium-Term Momentum Positive (EMA 12 > EMA 26)`;
+                    reasons.push(msg); positives.push(msg);
+                } else {
+                    score -= 1.0;
+                    const msg = `Medium-Term Momentum Weak (EMA 12 < EMA 26)`;
+                    reasons.push(msg); negatives.push(msg);
+                }
+            }
+
+            // 3. Aggressive Accumulation & Dip-Buying Logic (25% Weight)
+            const rsiVals = TA.rsi(data, 14);
+            if (rsiVals.length >= 2) {
+                const curRsi = rsiVals[rsiVals.length - 1].value;
+                if (curRsi < 35) {
+                    score += 3.0;
+                    const msg = `🎯 High-Conviction Dip Accumulation Zone (RSI ${curRsi} < 35) — Prime Entry for 5-10Y Horizon`;
+                    reasons.push(msg); positives.push(msg);
+                } else if (curRsi > 75) {
+                    // Minimal penalty for aggressive long-term investor on overbought momentum
+                    score -= 0.5;
+                    const msg = `High Short-Term Momentum (RSI ${curRsi}) — Consider Staggered DCA Entries`;
+                    reasons.push(msg); negatives.push(msg);
+                } else if (curRsi > 50) {
+                    score += 1.0;
+                    const msg = `Positive Relative Strength (RSI ${curRsi})`;
+                    reasons.push(msg); positives.push(msg);
+                }
+            }
+
+            // Bollinger Band Lower Dip Accumulation
+            const bb = TA.bollingerBands(data, 20, 2);
+            if (bb.upper && bb.upper.length > 0) {
+                const lowerB = bb.lower[bb.lower.length - 1].value;
+                if (lastClose <= lowerB) {
+                    score += 2.0;
+                    const msg = `🎯 Key Structural Dip Buy Level (Price at Lower Bollinger Support)`;
+                    reasons.push(msg); positives.push(msg);
+                }
+            }
+
+            // Institutional Volume Accumulation
+            const volSma = TA.volumeSma(data, 20);
+            if (volSma.length > 0) {
+                const avgVol = volSma[volSma.length - 1].value;
+                if (lastVol > avgVol * 1.25 && avgVol > 0) {
+                    score += 1.5;
+                    const msg = `Institutional Accumulation Volume Surge (${formatVolume(lastVol)} > 1.25x Avg)`;
+                    reasons.push(msg); positives.push(msg);
+                }
+            }
+
+            // Standardized Thresholds for Aggressive Long-Term Accumulator
+            if (score >= 5.0) {
+                return { rating: 'STRONG BUY', text: 'STRONG BUY 🚀', class: 'signal-strong-buy', score: +score.toFixed(1), reasons, positives, negatives };
+            } else if (score >= 2.0) {
+                return { rating: 'BUY', text: 'BUY ▲', class: 'signal-buy', score: +score.toFixed(1), reasons, positives, negatives };
+            } else if (score <= -5.0) {
+                return { rating: 'STRONG SELL', text: 'STRONG SELL 🔻', class: 'signal-strong-sell', score: +score.toFixed(1), reasons, positives, negatives };
+            } else if (score <= -2.0) {
+                return { rating: 'SELL', text: 'SELL ▼', class: 'signal-sell', score: +score.toFixed(1), reasons, positives, negatives };
+            } else {
+                return { rating: 'NEUTRAL', text: 'NEUTRAL ⬌', class: 'signal-neutral', score: +score.toFixed(1), reasons, positives, negatives };
+            }
+        }
+
+        // ================================================================
+        // FUNDAMENTAL ANALYSIS FETCH & RENDERING
+        // ================================================================
+
+        async function loadFundamentals(pane) {
+            const fundPanel = document.getElementById(`${pane.id}-fund-panel`);
+            if (!fundPanel) return;
+
+            try {
+                const resp = await fetch(`/api/fundamentals/${pane.source}/${encodeURIComponent(pane.symbol)}`);
+                const f = await resp.json();
+                pane.fundamentals = f;
+
+                const peTtmEl = document.getElementById(`${pane.id}-fund-pe-ttm`);
+                const peFwdEl = document.getElementById(`${pane.id}-fund-pe-fwd`);
+                const epsEl = document.getElementById(`${pane.id}-fund-eps`);
+                const pegEl = document.getElementById(`${pane.id}-fund-peg`);
+                const pbEl = document.getElementById(`${pane.id}-fund-pb`);
+                const mktcapEl = document.getElementById(`${pane.id}-fund-mktcap`);
+                const divEl = document.getElementById(`${pane.id}-fund-div`);
+                const marginEl = document.getElementById(`${pane.id}-fund-margin`);
+
+                if (peTtmEl) peTtmEl.textContent = f.pe_ttm != null ? f.pe_ttm : 'N/A';
+                if (peFwdEl) peFwdEl.textContent = f.pe_forward != null ? f.pe_forward : 'N/A';
+                if (epsEl) epsEl.textContent = f.eps_ttm != null ? `$${f.eps_ttm}` : 'N/A';
+
+                if (pegEl) {
+                    if (f.peg_ratio != null) {
+                        pegEl.textContent = f.peg_ratio;
+                        pegEl.className = `fund-value ${f.peg_ratio < 1.0 ? 'positive' : f.peg_ratio > 2.0 ? 'negative' : ''}`;
+                    } else {
+                        pegEl.textContent = 'N/A';
+                        pegEl.className = 'fund-value';
+                    }
+                }
+
+                if (pbEl) pbEl.textContent = f.pb_ratio != null ? f.pb_ratio : 'N/A';
+                if (mktcapEl) mktcapEl.textContent = f.market_cap != null ? formatVolume(f.market_cap) : 'N/A';
+                if (divEl) divEl.textContent = f.dividend_yield != null ? `${f.dividend_yield}%` : 'N/A';
+                if (marginEl) marginEl.textContent = f.profit_margins != null ? `${f.profit_margins}%` : 'N/A';
+
+                // Trigger Quant Hybrid Recommendation Engine update with Fundamental Inputs!
+                if (pane.candles && pane.candles.length > 0) {
+                    updateTickerBar(pane, pane.lastPrice || 0, 0, 0, 0);
+                }
+            } catch (e) {
+                console.warn('Failed to load fundamentals for', pane.symbol, e);
+            }
+        }
+
+        // ================================================================
         // TICKER BAR
         // ================================================================
 
         function updateTickerBar(pane, price, change, changePct, volume) {
             const sym = document.getElementById(`${pane.id}-ticker-sym`);
+            const nameEl = document.getElementById(`${pane.id}-ticker-name`);
             const priceEl = document.getElementById(`${pane.id}-ticker-price`);
             const changeEl = document.getElementById(`${pane.id}-ticker-change`);
             const volEl = document.getElementById(`${pane.id}-ticker-vol`);
+            const sigEl = document.getElementById(`${pane.id}-ticker-sig`);
             const tickerBar = document.getElementById(`${pane.id}-ticker`);
 
             sym.textContent = pane.symbol;
+            if (nameEl) {
+                nameEl.textContent = pane.companyName ? `— ${pane.companyName}` : '';
+            }
             priceEl.textContent = formatPrice(price);
 
             if (change !== 0) {
@@ -1629,6 +2661,69 @@
             if (volume) {
                 volEl.textContent = `Vol: ${formatVolume(volume)}`;
             }
+
+            // Update Technical Signal Badge
+            if (sigEl && pane.candles) {
+                const sig = computeSignal(pane);
+                sigEl.textContent = sig.text;
+                sigEl.className = `ticker-signal ${sig.class}`;
+                sigEl.style.cursor = 'pointer';
+                sigEl.title = `Click to view plain-text analysis breakdown for ${pane.symbol}`;
+                sigEl.onclick = () => openSignalModal(pane, sig);
+            }
+        }
+
+        function openSignalModal(pane, sig) {
+            const modal = document.getElementById('signal-modal');
+            const stockEl = document.getElementById('signal-modal-stock');
+            const priceEl = document.getElementById('signal-modal-price');
+            const badgeEl = document.getElementById('signal-modal-badge');
+            const summaryEl = document.getElementById('signal-modal-summary');
+            const posEl = document.getElementById('signal-modal-positives');
+            const negEl = document.getElementById('signal-modal-negatives');
+
+            if (!modal) return;
+
+            stockEl.textContent = `${pane.symbol}${pane.companyName ? ' — ' + pane.companyName : ''}`;
+            priceEl.textContent = `Current Price: ${formatPrice(pane.lastPrice || (pane.candles && pane.candles.length ? pane.candles[pane.candles.length - 1].close : 0))}`;
+            badgeEl.textContent = sig.text;
+            badgeEl.className = `ticker-signal ${sig.class}`;
+
+            let summaryText = '';
+            if (sig.rating === 'STRONG BUY' || sig.rating === 'BUY') {
+                summaryText = `⚡ AGGRESSIVE 5–10 YEAR OUTLOOK: ${pane.symbol} is recommended as ${sig.rating} with a composite growth score of +${sig.score}. Tailored for an aggressive investor with a 5-10 year horizon, this asset demonstrates high multi-year compounding potential (PEG growth valuation, forward earnings acceleration, strong profit margins) and structural macro trend support.`;
+            } else if (sig.rating === 'STRONG SELL' || sig.rating === 'SELL') {
+                summaryText = `⚠️ AGGRESSIVE 5–10 YEAR OUTLOOK: ${pane.symbol} is recommended as ${sig.rating} with a composite score of ${sig.score}. Even for a multi-year horizon, cash burn, negative EPS, or structural macro downtrends present elevated long-term risks.`;
+            } else {
+                summaryText = `⚖️ AGGRESSIVE 5–10 YEAR OUTLOOK: ${pane.symbol} is currently rated NEUTRAL with a composite score of ${sig.score}. Growth catalysts and risk factors are balanced; consider dollar-cost averaging (DCA) on structural dips.`;
+            }
+            summaryEl.textContent = summaryText;
+
+            // Render Positives
+            if (sig.positives && sig.positives.length > 0) {
+                posEl.innerHTML = sig.positives.map(p => `
+                    <div class="signal-factor-item positive">
+                        <span style="color: #10b981; font-weight: 700;">✓</span>
+                        <span>${p}</span>
+                    </div>
+                `).join('');
+            } else {
+                posEl.innerHTML = `<div class="signal-factor-item" style="color: var(--text-muted);">No major positive factors identified at this time.</div>`;
+            }
+
+            // Render Negatives
+            if (sig.negatives && sig.negatives.length > 0) {
+                negEl.innerHTML = sig.negatives.map(n => `
+                    <div class="signal-factor-item negative">
+                        <span style="color: #ef4444; font-weight: 700;">✕</span>
+                        <span>${n}</span>
+                    </div>
+                `).join('');
+            } else {
+                negEl.innerHTML = `<div class="signal-factor-item" style="color: var(--text-muted);">No major risk factors or negative concerns detected.</div>`;
+            }
+
+            modal.classList.add('active');
         }
 
         // ================================================================
@@ -1705,6 +2800,9 @@
 
             // Update ticker bar
             updateTickerBar(pane, price, change, changePct, volume);
+
+            // Evaluate alerts
+            checkAlerts(pane, price);
 
             // Update candle
             if (data.ohlcv) {
@@ -1824,10 +2922,190 @@
         }
 
         // ================================================================
+        // TOAST NOTIFICATIONS & ALERTS
+        // ================================================================
+
+        let activeAlertPane = null;
+        let activeAlerts = [];
+
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        function playAlertSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1760, ctx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.3);
+            } catch (_) {}
+        }
+
+        function checkAlerts(pane, price) {
+            if (!price || !activeAlerts.length) return;
+            activeAlerts.forEach(alert => {
+                if (alert.paneId === pane.id && alert.symbol === pane.symbol && !alert.triggered) {
+                    if (alert.condition === 'above' && price >= alert.targetPrice) {
+                        alert.triggered = true;
+                        playAlertSound();
+                        showToast(`🚨 ALERT: ${pane.symbol} rose above $${alert.targetPrice} (Current: $${price})`, 'warning');
+                    } else if (alert.condition === 'below' && price <= alert.targetPrice) {
+                        alert.triggered = true;
+                        playAlertSound();
+                        showToast(`🚨 ALERT: ${pane.symbol} dropped below $${alert.targetPrice} (Current: $${price})`, 'warning');
+                    }
+                }
+            });
+        }
+
+        // Setup Alert Modal listeners
+        function setupAlertModal() {
+            const modal = document.getElementById('alert-modal');
+            const closeBtn = document.getElementById('alert-modal-close');
+            const cancelBtn = document.getElementById('alert-modal-cancel');
+            const saveBtn = document.getElementById('alert-modal-save');
+
+            const closeModal = () => modal.classList.remove('active');
+            if (closeBtn) closeBtn.addEventListener('click', closeModal);
+            if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+            if (saveBtn) {
+                saveBtn.addEventListener('click', () => {
+                    const priceVal = parseFloat(document.getElementById('alert-modal-price').value);
+                    const condVal = document.getElementById('alert-modal-condition').value;
+
+                    if (isNaN(priceVal) || !activeAlertPane) {
+                        showToast('Please enter a valid target price', 'warning');
+                        return;
+                    }
+
+                    activeAlerts.push({
+                        paneId: activeAlertPane.id,
+                        symbol: activeAlertPane.symbol,
+                        targetPrice: priceVal,
+                        condition: condVal,
+                        triggered: false,
+                    });
+
+                    // Visual price line indicator for alert
+                    if (activeAlertPane.candleSeries) {
+                        activeAlertPane.candleSeries.createPriceLine({
+                            price: priceVal,
+                            color: condVal === 'above' ? '#10b981' : '#ef4444',
+                            lineWidth: 1.5,
+                            lineStyle: 1,
+                            title: `Alert ${condVal === 'above' ? '≥' : '≤'} ${priceVal}`,
+                        });
+                    }
+
+                    showToast(`Alert set for ${activeAlertPane.symbol} when price ${condVal} $${priceVal}`, 'success');
+                    closeModal();
+                });
+            }
+
+            // Fullscreen Toggle Button
+            const fullBtn = document.getElementById('fullscreen-btn');
+            if (fullBtn) {
+                fullBtn.addEventListener('click', () => {
+                    if (!document.fullscreenElement) {
+                        document.documentElement.requestFullscreen().catch(e => {
+                            showToast('Fullscreen mode not allowed', 'warning');
+                        });
+                        fullBtn.textContent = '⛶ Exit Fullscreen';
+                    } else {
+                        document.exitFullscreen();
+                        fullBtn.textContent = '⛶ Fullscreen';
+                    }
+                });
+            }
+
+            // Setup Signal Breakdown Modal listeners
+            const signalModal = document.getElementById('signal-modal');
+            const sigClose = document.getElementById('signal-modal-close');
+            const sigOk = document.getElementById('signal-modal-ok');
+            const closeSigModal = () => signalModal && signalModal.classList.remove('active');
+            if (sigClose) sigClose.addEventListener('click', closeSigModal);
+            if (sigOk) sigOk.addEventListener('click', closeSigModal);
+
+            // Esc key listener to close modals or restore maximized pane
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeModal();
+                    closeSigModal();
+                    document.querySelectorAll('.chart-pane.maximized').forEach(el => {
+                        el.classList.remove('maximized');
+                        const maxBtn = el.querySelector('.pane-action-btn[id$="-max-btn"]');
+                        if (maxBtn) maxBtn.textContent = '⤢ Expand';
+                    });
+                }
+            });
+        }
+
+        // Preset Workspaces Map
+        const BUILTIN_PRESETS = {
+            default_crypto: [
+                { source: 'hyperliquid', symbol: 'BTC', timeframe: '5m' },
+                { source: 'hyperliquid', symbol: 'ETH', timeframe: '5m' },
+            ],
+            binance_top: [
+                { source: 'binance', symbol: 'BTCUSDT', timeframe: '5m' },
+                { source: 'binance', symbol: 'ETHUSDT', timeframe: '5m' },
+            ],
+            us_tech: [
+                { source: 'yahoo_us', symbol: 'GOOGL', timeframe: '1D' },
+                { source: 'yahoo_us', symbol: 'AAPL', timeframe: '1D' },
+            ],
+            india_bluechips: [
+                { source: 'yahoo_india', symbol: 'RELIANCE.NS', timeframe: '1D' },
+                { source: 'yahoo_india', symbol: 'TCS.NS', timeframe: '1D' },
+            ],
+        };
+
+        async function loadPreset(presetKey) {
+            let configs = BUILTIN_PRESETS[presetKey];
+            if (!configs) {
+                // Check localStorage for custom saved presets
+                try {
+                    const saved = JSON.parse(localStorage.getItem('trading_dashboard_presets') || '{}');
+                    configs = saved[presetKey];
+                } catch (e) {}
+            }
+            if (!configs || !configs.length) return;
+
+            // Apply configs to DEFAULT_CONFIGS array
+            configs.forEach((cfg, idx) => {
+                DEFAULT_CONFIGS[idx] = cfg;
+            });
+
+            await setChartCount(configs.length);
+            showToast(`Loaded workspace preset`, 'success');
+        }
+
+        // ================================================================
         // INIT
         // ================================================================
 
         async function init() {
+            setupAlertModal();
+
             // Chart count buttons
             document.querySelectorAll('.count-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -1835,9 +3113,51 @@
                 });
             });
 
+            // Preset select
+            const presetSelect = document.getElementById('preset-select');
+            if (presetSelect) {
+                presetSelect.addEventListener('change', () => {
+                    loadPreset(presetSelect.value);
+                });
+            }
+
+            // Save layout button
+            const savePresetBtn = document.getElementById('save-preset-btn');
+            if (savePresetBtn) {
+                savePresetBtn.addEventListener('click', () => {
+                    const name = prompt('Enter a name for this workspace preset:', 'My Workspace');
+                    if (!name) return;
+
+                    const currentConfigs = panes.map(p => ({
+                        source: p.source,
+                        symbol: p.symbol,
+                        timeframe: p.timeframe,
+                    }));
+
+                    try {
+                        const saved = JSON.parse(localStorage.getItem('trading_dashboard_presets') || '{}');
+                        const key = 'custom_' + Date.now();
+                        saved[key] = currentConfigs;
+                        localStorage.setItem('trading_dashboard_presets', JSON.stringify(saved));
+
+                        // Add option to preset dropdown
+                        const opt = document.createElement('option');
+                        opt.value = key;
+                        opt.textContent = `⭐ ${name}`;
+                        presetSelect.appendChild(opt);
+                        presetSelect.value = key;
+
+                        showToast(`Saved layout "${name}" to LocalStorage`, 'success');
+                    } catch (e) {
+                        showToast(`Failed to save preset`, 'warning');
+                    }
+                });
+            }
+
             // Pre-load symbols for all sources
             await Promise.all([
                 loadSymbols('hyperliquid'),
+                loadSymbols('binance'),
                 loadSymbols('yahoo_us'),
                 loadSymbols('yahoo_india'),
             ]);

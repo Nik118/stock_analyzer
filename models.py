@@ -18,12 +18,9 @@ from pydantic import BaseModel, Field
 
 class DataSourceType(str, Enum):
     HYPERLIQUID = "hyperliquid"
+    BINANCE = "binance"
     YAHOO_US = "yahoo_us"
     YAHOO_INDIA = "yahoo_india"
-    # Future sources – add here when you wire them up
-    # ALPACA = "alpaca"
-    # BINANCE = "binance"
-    # ZERODHA = "zerodha"
 
 
 class Timeframe(str, Enum):

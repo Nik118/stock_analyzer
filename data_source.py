@@ -39,8 +39,6 @@ from datetime import datetime, timedelta
 from typing import AsyncGenerator, Dict, List, Optional
 
 import aiohttp
-import yfinance as yf
-import pandas as pd
 
 logger = logging.getLogger("data_source")
 
@@ -240,13 +238,13 @@ YAHOO_US_SYMBOLS: List[str] = [
 ]
 
 _YF_DIRECT_PARAMS: Dict[str, dict] = {
-    "1m":  {"range": "1d",  "interval": "1m"},
-    "5m":  {"range": "5d",  "interval": "5m"},
-    "15m": {"range": "5d",  "interval": "15m"},
-    "1h":  {"range": "1mo", "interval": "1h"},
-    "4h":  {"range": "3mo", "interval": "1h"},
-    "1D":  {"range": "1y",  "interval": "1d"},
-    "1W":  {"range": "5y",  "interval": "1wk"},
+    "1m":  {"range": "7d",   "interval": "1m"},
+    "5m":  {"range": "60d",  "interval": "5m"},
+    "15m": {"range": "60d",  "interval": "15m"},
+    "1h":  {"range": "2y",   "interval": "1h"},
+    "4h":  {"range": "2y",   "interval": "1h"},
+    "1D":  {"range": "10y",  "interval": "1d"},
+    "1W":  {"range": "max",  "interval": "1wk"},
 }
 
 USER_AGENT = (
@@ -306,12 +304,132 @@ async def _fetch_yahoo_chart_direct(symbol: str, timeframe: str) -> List[dict]:
         return []
 
 
+async def get_fundamentals(symbol: str, source: str) -> dict:
+    """Fetch key fundamental data (TTM PE, Forward PE, EPS, PEG, Market Cap, Dividend Yield, Profit Margin)."""
+    if source in ("yahoo_us", "yahoo_india"):
+        try:
+            headers = {"User-Agent": USER_AGENT}
+            async with aiohttp.ClientSession(headers=headers) as session:
+                # Obtain cookie & crumb
+                try:
+                    async with session.get("https://fc.yahoo.com") as _:
+                        pass
+                    async with session.get("https://query1.finance.yahoo.com/v1/test/getcrumb") as r:
+                        crumb = await r.text()
+                except Exception:
+                    crumb = ""
+
+                url = f"https://query1.finance.yahoo.com/v10/finance/quoteSummary/{symbol}?modules=defaultKeyStatistics,financialData,summaryDetail"
+                if crumb and "Invalid" not in crumb:
+                    url += f"&crumb={crumb}"
+
+                async with session.get(url, timeout=aiohttp.ClientTimeout(total=10)) as resp:
+                    if resp.status == 200:
+                        data = await resp.json()
+                        result = data.get("quoteSummary", {}).get("result", [{}])[0]
+                        ks = result.get("defaultKeyStatistics", {})
+                        sd = result.get("summaryDetail", {})
+                        fd = result.get("financialData", {})
+
+                        def _fmt(d, default=None):
+                            if isinstance(d, dict):
+                                return d.get("raw", default)
+                            return d if d is not None else default
+
+                        pe_ttm = _fmt(sd.get("trailingPE"))
+                        pe_forward = _fmt(ks.get("forwardPE")) or _fmt(sd.get("forwardPE"))
+                        eps_ttm = _fmt(ks.get("trailingEps"))
+                        peg_ratio = _fmt(ks.get("pegRatio"))
+                        market_cap = _fmt(sd.get("marketCap"))
+                        div_yield = _fmt(sd.get("dividendYield"))
+                        profit_margins = _fmt(fd.get("profitMargins"))
+                        pb_ratio = _fmt(ks.get("priceToBook"))
+
+                        return {
+                            "symbol": symbol,
+                            "source": source,
+                            "pe_ttm": round(float(pe_ttm), 2) if pe_ttm is not None else None,
+                            "pe_forward": round(float(pe_forward), 2) if pe_forward is not None else None,
+                            "eps_ttm": round(float(eps_ttm), 2) if eps_ttm is not None else None,
+                            "peg_ratio": round(float(peg_ratio), 2) if peg_ratio is not None else None,
+                            "pb_ratio": round(float(pb_ratio), 2) if pb_ratio is not None else None,
+                            "market_cap": float(market_cap) if market_cap is not None else None,
+                            "dividend_yield": round(float(div_yield) * 100, 2) if div_yield is not None else None,
+                            "profit_margins": round(float(profit_margins) * 100, 2) if profit_margins is not None else None,
+                        }
+        except Exception as exc:
+            logger.warning("get_fundamentals error (%s): %s", symbol, exc)
+
+    return {
+        "symbol": symbol,
+        "source": source,
+        "pe_ttm": None,
+        "pe_forward": None,
+        "eps_ttm": None,
+        "peg_ratio": None,
+        "market_cap": None,
+        "dividend_yield": None,
+    }
+
+
+async def search_symbols(query: str, source: str) -> List[dict]:
+    """Search available stock or crypto symbols matching query."""
+    if not query:
+        return []
+
+    q_str = query.strip()
+
+    if source in ("yahoo_us", "yahoo_india"):
+        url = f"https://query1.finance.yahoo.com/v1/finance/search?q={q_str}&quotesCount=10&newsCount=0"
+        headers = {"User-Agent": USER_AGENT}
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, headers=headers, timeout=aiohttp.ClientTimeout(total=5)) as resp:
+                    if resp.status == 200:
+                        data = await resp.json()
+                        quotes = data.get("quotes", [])
+                        results = []
+                        for item in quotes:
+                            sym = item.get("symbol")
+                            if not sym:
+                                continue
+
+                            # For Yahoo India, append .NS if user searched without suffix
+                            if source == "yahoo_india" and not (sym.endswith(".NS") or sym.endswith(".BO")):
+                                if not any(char in sym for char in (".", "=")):
+                                    sym = f"{sym}.NS"
+
+                            short_name = item.get("shortname") or item.get("longname") or sym
+                            exch = item.get("exchDisp") or item.get("exchange") or ""
+                            results.append({
+                                "symbol": sym,
+                                "name": f"{sym} — {short_name} ({exch})",
+                                "exchange": exch,
+                            })
+                        return results
+        except Exception as exc:
+            logger.warning("search_symbols error (%s/%s): %s", source, q_str, exc)
+            return []
+
+    elif source == "hyperliquid":
+        symbols = await hyperliquid_get_symbols()
+        query_upper = q_str.upper()
+        return [s for s in symbols if query_upper in s["symbol"].upper()]
+
+    elif source == "binance":
+        symbols = await binance_get_symbols()
+        query_upper = q_str.upper()
+        return [s for s in symbols if query_upper in s["symbol"].upper()]
+
+    return []
+
+
 async def yahoo_us_get_historical(
-    symbol: str, timeframe: str, limit: int = 300
+    symbol: str, timeframe: str, limit: int = 3000
 ) -> List[dict]:
     """Fetch historical data from Yahoo Finance for US stocks."""
     candles = await _fetch_yahoo_chart_direct(symbol, timeframe)
-    return candles[-limit:]
+    return candles[-limit:] if limit else candles
 
 
 async def yahoo_us_subscribe_live(
@@ -374,11 +492,11 @@ YAHOO_INDIA_SYMBOLS: List[str] = [
 
 
 async def yahoo_india_get_historical(
-    symbol: str, timeframe: str, limit: int = 300
+    symbol: str, timeframe: str, limit: int = 3000
 ) -> List[dict]:
     """Fetch historical data from Yahoo Finance for Indian stocks."""
     candles = await _fetch_yahoo_chart_direct(symbol, timeframe)
-    return candles[-limit:]
+    return candles[-limit:] if limit else candles
 
 
 async def yahoo_india_subscribe_live(
@@ -429,6 +547,104 @@ async def yahoo_india_get_symbols() -> List[dict]:
 
 
 # ╔══════════════════════════════════════════════════════════════════════════╗
+# ║  BINANCE  —  Crypto (free public WebSocket & REST)                       ║
+# ╚══════════════════════════════════════════════════════════════════════════╝
+
+BINANCE_SYMBOLS: List[str] = [
+    "BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "ADAUSDT", "DOGEUSDT",
+    "XRPUSDT", "AVAXUSDT", "DOTUSDT", "LINKUSDT", "NEARUSDT", "PEPEUSDT",
+]
+
+_BINANCE_INTERVAL_MAP: Dict[str, str] = {
+    "1m": "1m", "5m": "5m", "15m": "15m",
+    "1h": "1h", "4h": "4h", "1D": "1d", "1W": "1w",
+}
+
+
+async def binance_get_historical(
+    symbol: str, timeframe: str, limit: int = 300
+) -> List[dict]:
+    """Fetch historical candles from Binance public REST API."""
+    interval = _BINANCE_INTERVAL_MAP.get(timeframe, "1h")
+    url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}"
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, timeout=aiohttp.ClientTimeout(total=10)) as resp:
+                if resp.status != 200:
+                    logger.warning("Binance REST error: status %s for %s", resp.status, symbol)
+                    return []
+                data = await resp.json()
+
+        candles: List[dict] = []
+        for item in data:
+            candles.append({
+                "time": int(item[0]) // 1000,
+                "open": float(item[1]),
+                "high": float(item[2]),
+                "low": float(item[3]),
+                "close": float(item[4]),
+                "volume": float(item[5]),
+            })
+        return candles
+    except Exception as exc:
+        logger.error("binance_get_historical error (%s): %s", symbol, exc)
+        return []
+
+
+async def binance_subscribe_live(
+    symbol: str, timeframe: str
+) -> AsyncGenerator[dict, None]:
+    """
+    Connect to Binance public WebSocket for real-time kline updates.
+    """
+    interval = _BINANCE_INTERVAL_MAP.get(timeframe, "1m")
+    ws_url = f"wss://stream.binance.com:9443/ws/{symbol.lower()}@kline_{interval}"
+    backoff = 1
+    while True:
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.ws_connect(ws_url, heartbeat=20, timeout=30) as ws:
+                    backoff = 1
+                    async for msg in ws:
+                        if msg.type == aiohttp.WSMsgType.TEXT:
+                            data = json.loads(msg.data)
+                            k = data.get("k", {})
+                            if k:
+                                price = float(k["c"])
+                                ts = int(k["t"]) // 1000
+                                yield {
+                                    "symbol": symbol,
+                                    "price": price,
+                                    "volume": float(k["v"]),
+                                    "timestamp": ts,
+                                    "ohlcv": {
+                                        "time": ts,
+                                        "open": float(k["o"]),
+                                        "high": float(k["h"]),
+                                        "low": float(k["l"]),
+                                        "close": price,
+                                        "volume": float(k["v"]),
+                                    },
+                                }
+                        elif msg.type in (aiohttp.WSMsgType.CLOSED, aiohttp.WSMsgType.ERROR):
+                            break
+        except asyncio.CancelledError:
+            return
+        except Exception as exc:
+            logger.warning("Binance WS error (%s): %s — reconnecting in %ss", symbol, exc, backoff)
+            await asyncio.sleep(backoff)
+            backoff = min(backoff * 2, 30)
+
+
+async def binance_get_symbols() -> List[dict]:
+    """Return list of popular Binance USDT trading pairs."""
+    return [
+        {"symbol": s, "name": f"{s.replace('USDT', '')}/USDT", "exchange": "Binance", "asset_type": "crypto"}
+        for s in BINANCE_SYMBOLS
+    ]
+
+
+# ╔══════════════════════════════════════════════════════════════════════════╗
 # ║  DATA_SOURCES  —  The registry. Add new brokers here.                  ║
 # ╚══════════════════════════════════════════════════════════════════════════╝
 
@@ -438,6 +654,12 @@ DATA_SOURCES: Dict[str, dict] = {
         "subscribe_live": hyperliquid_subscribe_live,
         "get_symbols": hyperliquid_get_symbols,
         "label": "Hyperliquid (Crypto)",
+    },
+    "binance": {
+        "get_historical": binance_get_historical,
+        "subscribe_live": binance_subscribe_live,
+        "get_symbols": binance_get_symbols,
+        "label": "Binance (Crypto)",
     },
     "yahoo_us": {
         "get_historical": yahoo_us_get_historical,
@@ -451,25 +673,4 @@ DATA_SOURCES: Dict[str, dict] = {
         "get_symbols": yahoo_india_get_symbols,
         "label": "Yahoo Finance (India)",
     },
-    # ── EXAMPLE: Adding Alpaca ──────────────────────────────────────────
-    # "alpaca": {
-    #     "get_historical": alpaca_get_historical,
-    #     "subscribe_live": alpaca_subscribe_live,
-    #     "get_symbols": alpaca_get_symbols,
-    #     "label": "Alpaca (US Stocks)",
-    # },
-    # ── EXAMPLE: Adding Binance ─────────────────────────────────────────
-    # "binance": {
-    #     "get_historical": binance_get_historical,
-    #     "subscribe_live": binance_subscribe_live,
-    #     "get_symbols": binance_get_symbols,
-    #     "label": "Binance (Crypto)",
-    # },
-    # ── EXAMPLE: Adding Zerodha ─────────────────────────────────────────
-    # "zerodha": {
-    #     "get_historical": zerodha_get_historical,
-    #     "subscribe_live": zerodha_subscribe_live,
-    #     "get_symbols": zerodha_get_symbols,
-    #     "label": "Zerodha (India)",
-    # },
 }

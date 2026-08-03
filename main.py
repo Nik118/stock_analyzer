@@ -98,7 +98,7 @@ async def get_historical(
     source: str,
     symbol: str,
     timeframe: str = Query(default="1D", description="Candle timeframe"),
-    limit: int = Query(default=300, ge=1, le=1000),
+    limit: int = Query(default=3000, ge=1, le=10000),
 ):
     """Fetch historical OHLCV candles for a symbol."""
     src = DATA_SOURCES.get(source)
@@ -115,6 +115,30 @@ async def get_historical(
     except Exception as exc:
         logger.error("get_historical error (%s/%s): %s", source, symbol, exc)
         return {"error": str(exc), "candles": []}
+
+
+@app.get("/api/fundamentals/{source}/{symbol}")
+async def get_fundamentals_route(source: str, symbol: str):
+    """Fetch fundamental metrics (TTM PE, Forward PE, EPS, PEG, Market Cap, etc.)."""
+    from data_source import get_fundamentals
+    try:
+        data = await get_fundamentals(symbol, source)
+        return data
+    except Exception as exc:
+        logger.error("get_fundamentals error (%s/%s): %s", source, symbol, exc)
+        return {"error": str(exc), "symbol": symbol, "source": source}
+
+
+@app.get("/api/search/{source}")
+async def search_symbols_route(source: str, q: str = Query(default="", description="Search query")):
+    """Search stock or crypto ticker symbols matching query."""
+    from data_source import search_symbols
+    try:
+        results = await search_symbols(q, source)
+        return {"source": source, "query": q, "results": results}
+    except Exception as exc:
+        logger.error("search_symbols error (%s/%s): %s", source, q, exc)
+        return {"error": str(exc), "results": []}
 
 
 # ---------------------------------------------------------------------------
