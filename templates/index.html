@@ -1535,10 +1535,12 @@
         // ================================================================
 
         function formatPrice(price) {
-            if (price >= 10000) return price.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-            if (price >= 100)   return price.toFixed(2);
-            if (price >= 1)     return price.toFixed(4);
-            return price.toFixed(6);
+            if (price === null || price === undefined || isNaN(price) || price === 0) return '—';
+            const num = Number(price);
+            if (num >= 10000) return num.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+            if (num >= 100)   return num.toFixed(2);
+            if (num >= 1)     return num.toFixed(4);
+            return num.toFixed(6);
         }
 
         function formatVolume(vol) {
@@ -1847,13 +1849,12 @@
                 });
             });
 
-            // Pane Action Buttons (Fundamentals, Line, Alert, PNG, CSV)
+            // Pane Action Buttons (Fundamentals, Line, Alert, PNG)
             const fundBtn = document.getElementById(`${id}-fund-btn`);
             const fundPanel = document.getElementById(`${id}-fund-panel`);
             const lineBtn = document.getElementById(`${id}-line-btn`);
             const alertBtn = document.getElementById(`${id}-alert-btn`);
             const snapBtn = document.getElementById(`${id}-snap-btn`);
-            const csvBtn = document.getElementById(`${id}-csv-btn`);
 
             if (fundBtn && fundPanel) {
                 fundBtn.addEventListener('click', () => {
@@ -2357,6 +2358,25 @@
                         pane.indicatorSeries.obv = s;
                         pane.chart.priceScale('obv').applyOptions({
                             scaleMargins: { top: 0.8, bottom: 0 },
+                        });
+                        break;
+                    }
+                    case 'stoch': {
+                        const stochRes = TA.stochastic(data, 14, 3, 3);
+                        const sK = pane.chart.addLineSeries({
+                            color: '#eab308', lineWidth: 1.2, priceLineVisible: false,
+                            lastValueVisible: false, priceScaleId: 'stoch',
+                        });
+                        sK.setData(stochRes.k);
+                        const sD = pane.chart.addLineSeries({
+                            color: '#f97316', lineWidth: 1, lineStyle: 2, priceLineVisible: false,
+                            lastValueVisible: false, priceScaleId: 'stoch',
+                        });
+                        sD.setData(stochRes.d);
+                        pane.indicatorSeries.stochK = sK;
+                        pane.indicatorSeries.stochD = sD;
+                        pane.chart.priceScale('stoch').applyOptions({
+                            scaleMargins: { top: 0.75, bottom: 0.05 },
                         });
                         break;
                     }

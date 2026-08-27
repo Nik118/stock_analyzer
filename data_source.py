@@ -254,10 +254,11 @@ USER_AGENT = (
 )
 
 
-async def _fetch_yahoo_chart_direct(symbol: str, timeframe: str) -> List[dict]:
+async def _fetch_yahoo_chart_direct(symbol: str, timeframe: str, custom_range: Optional[str] = None) -> List[dict]:
     """Fetch candles directly from Yahoo Finance API without yfinance scraper bugs."""
     p = _YF_DIRECT_PARAMS.get(timeframe, _YF_DIRECT_PARAMS["1D"])
-    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?range={p['range']}&interval={p['interval']}"
+    fetch_range = custom_range if custom_range else p["range"]
+    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?range={fetch_range}&interval={p['interval']}"
     headers = {"User-Agent": USER_AGENT}
     try:
         async with aiohttp.ClientSession() as session:
@@ -267,37 +268,52 @@ async def _fetch_yahoo_chart_direct(symbol: str, timeframe: str) -> List[dict]:
                     return []
                 data = await resp.json()
 
-        result = data.get("chart", {}).get("result")
-        if not result:
+        chart_node = data.get("chart") or {}
+        result = chart_node.get("result")
+        if not result or not isinstance(result, list) or len(result) == 0:
             return []
 
         chart_data = result[0]
-        timestamps = chart_data.get("timestamp", [])
-        quote = chart_data.get("indicators", {}).get("quote", [{}])[0]
+        timestamps = chart_data.get("timestamp") or []
+        quote_list = (chart_data.get("indicators") or {}).get("quote") or [{}]
+        quote = quote_list[0] if quote_list else {}
 
-        opens = quote.get("open", [])
-        highs = quote.get("high", [])
-        lows = quote.get("low", [])
-        closes = quote.get("close", [])
-        volumes = quote.get("volume", [])
+        opens = quote.get("open") or []
+        highs = quote.get("high") or []
+        lows = quote.get("low") or []
+        closes = quote.get("close") or []
+        volumes = quote.get("volume") or []
 
         candles = []
+        seen_times = set()
         for i in range(len(timestamps)):
             c = closes[i] if i < len(closes) else None
             if c is None:
                 continue
+            t = timestamps[i]
+            if t in seen_times:
+                continue
+            seen_times.add(t)
+
             o = opens[i] if i < len(opens) and opens[i] is not None else c
-            h = highs[i] if i < len(highs) and highs[i] is not None else c
-            l = lows[i] if i < len(lows) and lows[i] is not None else c
+            h = highs[i] if i < len(highs) and highs[i] is not None else max(float(o), float(c))
+            l = lows[i] if i < len(lows) and lows[i] is not None else min(float(o), float(c))
             v = volumes[i] if i < len(volumes) and volumes[i] is not None else 0
+
+            # Ensure high is >= low
+            h_val = max(float(h), float(o), float(c))
+            l_val = min(float(l), float(o), float(c))
+
             candles.append({
-                "time": timestamps[i],
+                "time": int(t),
                 "open": round(float(o), 4),
-                "high": round(float(h), 4),
-                "low": round(float(l), 4),
+                "high": round(h_val, 4),
+                "low": round(l_val, 4),
                 "close": round(float(c), 4),
                 "volume": float(v),
             })
+
+        candles.sort(key=lambda x: x["time"])
         return candles
     except Exception as exc:
         logger.error("_fetch_yahoo_chart_direct error (%s): %s", symbol, exc)
@@ -306,6 +322,19 @@ async def _fetch_yahoo_chart_direct(symbol: str, timeframe: str) -> List[dict]:
 
 async def get_fundamentals(symbol: str, source: str) -> dict:
     """Fetch key fundamental data (TTM PE, Forward PE, EPS, PEG, Market Cap, Dividend Yield, Profit Margin)."""
+    default_ret = {
+        "symbol": symbol,
+        "source": source,
+        "pe_ttm": None,
+        "pe_forward": None,
+        "eps_ttm": None,
+        "peg_ratio": None,
+        "pb_ratio": None,
+        "market_cap": None,
+        "dividend_yield": None,
+        "profit_margins": None,
+    }
+
     if source in ("yahoo_us", "yahoo_india"):
         try:
             headers = {"User-Agent": USER_AGENT}
@@ -326,10 +355,13 @@ async def get_fundamentals(symbol: str, source: str) -> dict:
                 async with session.get(url, timeout=aiohttp.ClientTimeout(total=10)) as resp:
                     if resp.status == 200:
                         data = await resp.json()
-                        result = data.get("quoteSummary", {}).get("result", [{}])[0]
-                        ks = result.get("defaultKeyStatistics", {})
-                        sd = result.get("summaryDetail", {})
-                        fd = result.get("financialData", {})
+                        results = (data.get("quoteSummary") or {}).get("result")
+                        if not results or not isinstance(results, list):
+                            return default_ret
+                        result = results[0]
+                        ks = result.get("defaultKeyStatistics") or {}
+                        sd = result.get("summaryDetail") or {}
+                        fd = result.get("financialData") or {}
 
                         def _fmt(d, default=None):
                             if isinstance(d, dict):
@@ -360,16 +392,7 @@ async def get_fundamentals(symbol: str, source: str) -> dict:
         except Exception as exc:
             logger.warning("get_fundamentals error (%s): %s", symbol, exc)
 
-    return {
-        "symbol": symbol,
-        "source": source,
-        "pe_ttm": None,
-        "pe_forward": None,
-        "eps_ttm": None,
-        "peg_ratio": None,
-        "market_cap": None,
-        "dividend_yield": None,
-    }
+    return default_ret
 
 
 async def search_symbols(query: str, source: str) -> List[dict]:
@@ -441,7 +464,7 @@ async def yahoo_us_subscribe_live(
     last_price: Optional[float] = None
     while True:
         try:
-            candles = await _fetch_yahoo_chart_direct(symbol, "1m")
+            candles = await _fetch_yahoo_chart_direct(symbol, "1m", custom_range="1d")
             if candles:
                 latest = candles[-1]
                 price = latest["close"]
@@ -508,7 +531,7 @@ async def yahoo_india_subscribe_live(
     last_price: Optional[float] = None
     while True:
         try:
-            candles = await _fetch_yahoo_chart_direct(symbol, "1m")
+            candles = await _fetch_yahoo_chart_direct(symbol, "1m", custom_range="1d")
             if candles:
                 latest = candles[-1]
                 price = latest["close"]
